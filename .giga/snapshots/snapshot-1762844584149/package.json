@@ -1,28 +1,8 @@
 {
-  "name": "neurobridge",
-  "version": "1.0.0",
-  "description": "A neural interface bridge system for processing and analyzing brain-computer interface data",
-  "private": false,
+  "name": "vite_react_shadcn_ts",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
-  "keywords": [
-    "neural-interface",
-    "brain-computer-interface",
-    "bci",
-    "signal-processing",
-    "neuroscience",
-    "react",
-    "typescript"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/neurobridge.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/neurobridge/issues"
-  },
-  "homepage": "https://github.com/yourusername/neurobridge#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

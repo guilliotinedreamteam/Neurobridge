@@ -1,0 +1,13 @@
+{
+  "snapshots": [
+    {
+      "id": "snapshot-1762844584149",
+      "timestamp": 1762844584196,
+      "description": "Before AI changes: 13 files",
+      "fileCount": 82,
+      "size": "1.23 MB"
+    }
+  ],
+  "maxSnapshots": 10,
+  "currentSnapshot": "snapshot-1762844584149"
+}
