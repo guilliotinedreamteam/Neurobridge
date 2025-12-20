@@ -1,11 +1,24 @@
 
+"""
+Training Pipeline for NeuroBridge.
+
+This module orchestrates the model creation, data generation, and training loop.
+It saves the trained model artifact for later inference.
+"""
+
 import os
 import tensorflow as tf
 from src.model import build_neurobridge_decoder
 from src.data import data_generator
 from src.config import NUM_TIMESTEPS, NUM_FEATURES, NUM_PHONEMES, BATCH_SIZE, EPOCHS, TOTAL_MOCK_SAMPLES
 
-def train_model():
+def train_model() -> tf.keras.callbacks.History:
+    """
+    Executes the training process.
+
+    Returns:
+        The Keras History object containing training metrics.
+    """
     print("\nInstantiating NeuroBridge Decoder Model...")
     model = build_neurobridge_decoder(NUM_TIMESTEPS, NUM_FEATURES, NUM_PHONEMES)
 
