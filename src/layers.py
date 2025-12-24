@@ -2,13 +2,14 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 from typing import Optional
+from src.config import DROPOUT_RATE
 
 class RelativeMultiHeadSelfAttention(layers.Layer):
     """
     Multi-Head Self-Attention with Relative Positional Encodings.
     Based on Transformer-XL style relative attention.
     """
-    def __init__(self, embed_dim, num_heads=2, dropout=0.1):
+    def __init__(self, embed_dim, num_heads=2, dropout=DROPOUT_RATE):
         super(RelativeMultiHeadSelfAttention, self).__init__()
         self.embed_dim = embed_dim
         self.num_heads = num_heads
@@ -138,7 +139,7 @@ class RelativeMultiHeadSelfAttention(layers.Layer):
         return output
 
 class ConvolutionModule(layers.Layer):
-    def __init__(self, embed_dim, kernel_size=31, dropout=0.1):
+    def __init__(self, embed_dim, kernel_size=31, dropout=DROPOUT_RATE):
         super(ConvolutionModule, self).__init__()
         self.layer_norm = layers.LayerNormalization(epsilon=1e-6)
         self.pointwise_conv1 = layers.Conv1D(
@@ -168,7 +169,7 @@ class ConvolutionModule(layers.Layer):
         return x
 
 class FeedForwardModule(layers.Layer):
-    def __init__(self, embed_dim, expansion_factor=4, dropout=0.1):
+    def __init__(self, embed_dim, expansion_factor=4, dropout=DROPOUT_RATE):
         super(FeedForwardModule, self).__init__()
         self.layer_norm = layers.LayerNormalization(epsilon=1e-6)
         self.dense1 = layers.Dense(embed_dim * expansion_factor, activation="swish")
@@ -185,7 +186,7 @@ class FeedForwardModule(layers.Layer):
         return x
 
 class ConformerBlock(layers.Layer):
-    def __init__(self, embed_dim, num_heads=4, kernel_size=31, dropout=0.1):
+    def __init__(self, embed_dim, num_heads=4, kernel_size=31, dropout=DROPOUT_RATE):
         super(ConformerBlock, self).__init__()
         self.ff1 = FeedForwardModule(embed_dim, dropout=dropout)
         # Replaced standard MHSA with Relative MHSA

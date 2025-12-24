@@ -23,3 +23,9 @@ D_MODEL: Final[int] = 144  # Embedding dimension (must be divisible by num_heads
 NUM_HEADS: Final[int] = 4
 KERNEL_SIZE: Final[int] = 15
 NUM_LAYERS: Final[int] = 2
+
+# Regularization & Optimization
+DROPOUT_RATE: Final[float] = 0.1
+WARMUP_STEPS: Final[int] = 4000
+CLIP_NORM: Final[float] = 1.0  # Gradient clipping to prevent explosion
+PATIENCE: Final[int] = 10      # Early stopping patience
