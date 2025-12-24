@@ -5,25 +5,27 @@
 
 This project implements a state-of-the-art Deep Learning architecture for **Brain-Computer Interface (BCI)** applications, specifically designed to decode intracranial electrocorticography (ECoG) signals into intelligible speech (phonemes).
 
-The core hypothesis is that high-density neural activity in the sensorimotor cortex contains sufficient temporal information to reconstruct the kinematic and acoustic properties of speech. NeuroBridge utilizes **Recurrent Neural Networks (RNNs)**, specifically Bidirectional Long Short-Term Memory (LSTM) units, to model the complex, non-linear, and temporal dynamics of these neural signals.
+The core hypothesis is that high-density neural activity in the sensorimotor cortex contains sufficient temporal information to reconstruct the kinematic and acoustic properties of speech. NeuroBridge utilizes a **Conformer (Convolution-augmented Transformer)** architecture to model the complex, non-linear, and temporal dynamics of these neural signals.
 
-This approach aligns with groundbreaking research from leading institutions (e.g., UCSF, Stanford) in the field of speech neuroprosthetics, aiming to restore communication for individuals with severe paralysis or speech deficits (e.g., ALS, brainstem stroke).
+This approach aligns with groundbreaking research from leading institutions (e.g., UCSF, Stanford) in the field of speech neuroprosthetics, aiming to restore communication for individuals with severe paralysis or speech deficits (e.g., ALS, brainstem stroke). By combining the local feature extraction of CNNs with the global context of Transformers, the Conformer outperforms traditional RNNs in capturing long-range dependencies.
 
 ## Architecture
 
-The system is composed of two primary model variants:
+The system is designed around a unified Conformer-based architecture:
 
 1.  **Offline Decoder (`build_neurobridge_decoder`)**:
     *   **Input**: Time-series ECoG data (Batch, Timesteps, Channels).
-    *   **Core**: Stacked **Bidirectional LSTM** layers. This architecture captures context from both past and future neural states within a sentence or utterance, maximizing decoding accuracy for offline analysis.
-    *   **Regularization**: Batch Normalization is applied after each recurrent layer to stabilize training and accelerate convergence.
+    *   **Core**: Stacked **Conformer Blocks**. Each block consists of:
+        *   **Feed Forward Module**: Two linear projections with SiLU (Swish) activation.
+        *   **Multi-Head Self-Attention (MHSA)**: Captures global temporal context.
+        *   **Convolution Module**: Captures local temporal patterns using 1D depthwise convolutions and GLU activation.
     *   **Output**: A TimeDistributed Dense layer with Softmax activation predicting the probability distribution over the phoneme set (including silence) for each timestep.
 
 2.  **Real-Time Decoder (`build_realtime_decoder`)**:
-    *   **Constraint**: Causal processing (no look-ahead).
-    *   **Core**: Stacked **Unidirectional LSTM** layers. This ensures that predictions at time *t* depend only on neural activity up to time *t*, enabling low-latency, real-time synthesis.
-    *   **Inference Strategy**: Uses a sliding window buffer to maintain sufficient historical context for stable predictions.
-    *   **Note**: The current prototype demonstrates inference using the trained **Bidirectional** model within a sliding window to leverage the weights learned during offline training. In a production deployment, a Unidirectional model would be trained specifically for low-latency causal inference.
+    *   **Constraint**: Low-latency inference.
+    *   **Core**: Reuses the **Conformer** architecture. While standard self-attention is non-causal (looks at the whole sequence), this prototype achieves pseudo-real-time operation by processing a **sliding window** of neural data.
+    *   **Inference Strategy**: A sliding window buffer maintains the necessary historical context (e.g., 100 timesteps) to allow the Conformer to generate stable predictions for the most recent frame.
+    *   **Future Optimization**: A strictly causal Conformer (with masked attention) could be trained to further reduce latency requirements.
 
 ## Project Structure
 

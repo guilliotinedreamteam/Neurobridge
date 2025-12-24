@@ -17,3 +17,9 @@ NUM_PHONEMES: Final[int] = 41      # e.g., 40 phonemes + 1 silence token
 BATCH_SIZE: Final[int] = 32
 EPOCHS: Final[int] = 5
 TOTAL_MOCK_SAMPLES: Final[int] = 1000
+
+# Conformer Hyperparameters
+D_MODEL: Final[int] = 144  # Embedding dimension (must be divisible by num_heads)
+NUM_HEADS: Final[int] = 4
+KERNEL_SIZE: Final[int] = 15
+NUM_LAYERS: Final[int] = 2

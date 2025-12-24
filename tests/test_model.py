@@ -18,10 +18,10 @@ class TestNeuroBridgeModel(unittest.TestCase):
         self.assertEqual(model.output_shape[1:], (NUM_TIMESTEPS, NUM_PHONEMES))
 
     def test_build_realtime_decoder(self):
-        """Test the real-time unidirectional decoder architecture."""
-        # For real-time, we typically process small chunks or single frames,
-        # but the model definition allows flexible timesteps.
-        timesteps = 1
+        """Test the real-time decoder architecture."""
+        # For this Conformer prototype, the real-time decoder mirrors the offline architecture
+        # and relies on sliding window inference.
+        timesteps = NUM_TIMESTEPS
         model = build_realtime_decoder(timesteps, NUM_FEATURES, NUM_PHONEMES)
         self.assertIsInstance(model, tf.keras.Model)
 
