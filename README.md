@@ -31,7 +31,10 @@ The system is designed around a unified Conformer-based architecture:
 
 *   `src/`: Source code package.
     *   `config.py`: Hyperparameters and system configuration.
-    *   `data.py`: Utilities for loading and simulating high-dimensional ECoG data.
+    *   `data.py`: **Advanced Data Engine**.
+        *   `NeuralDataLoader`: Unified interface for loading clinical `.mat` files or generating physiological simulations.
+        *   `generate_pink_noise`: Simulates **1/f (Pink) Noise**, mimicking the power-law spectral density of actual neural field potentials for rigorous testing without patient data.
+        *   `PatientMetadata`: Dataclass structure for handling related health info (e.g., Grid Geometry, Pathology, Hemisphere).
     *   `model.py`: Keras/TensorFlow definitions of the neural architectures.
     *   `train.py`: Training pipeline with ModelCheckpointing and artifact management.
     *   `inference.py`: Real-time inference engine with sliding window buffering.
