@@ -2,7 +2,7 @@
 import unittest
 import tensorflow as tf
 import numpy as np
-from src.layers import MultiHeadSelfAttention, ConvolutionModule, FeedForwardModule, ConformerBlock
+from src.layers import RelativeMultiHeadSelfAttention, ConvolutionModule, FeedForwardModule, ConformerBlock
 from src.config import D_MODEL, NUM_HEADS, KERNEL_SIZE
 
 class TestConformerLayers(unittest.TestCase):
@@ -13,8 +13,8 @@ class TestConformerLayers(unittest.TestCase):
         self.dummy_input = tf.random.normal(self.input_shape)
 
     def test_multi_head_self_attention(self):
-        """Test the MHSA layer."""
-        layer = MultiHeadSelfAttention(embed_dim=D_MODEL, num_heads=NUM_HEADS)
+        """Test the Relative MHSA layer."""
+        layer = RelativeMultiHeadSelfAttention(embed_dim=D_MODEL, num_heads=NUM_HEADS)
         output = layer(self.dummy_input)
         self.assertEqual(output.shape, self.input_shape)
 

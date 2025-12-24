@@ -78,6 +78,34 @@ def generate_pink_noise(num_samples: int, timesteps: int, features: int) -> np.n
 
     return pink_normalized.astype(np.float32)
 
+def spec_augment(ecog_data: np.ndarray, time_mask_param: int = 20, feature_mask_param: int = 15) -> np.ndarray:
+    """
+    Applies SpecAugment-style masking to ECoG data.
+
+    Args:
+        ecog_data: Input data of shape (batch, timesteps, features).
+        time_mask_param: Maximum width of time mask.
+        feature_mask_param: Maximum width of feature mask.
+
+    Returns:
+        Augmented data.
+    """
+    batch_size, timesteps, features = ecog_data.shape
+    augmented = ecog_data.copy()
+
+    for i in range(batch_size):
+        # Time Masking
+        t = np.random.randint(0, time_mask_param)
+        t0 = np.random.randint(0, timesteps - t)
+        augmented[i, t0:t0+t, :] = 0
+
+        # Feature Masking
+        f = np.random.randint(0, feature_mask_param)
+        f0 = np.random.randint(0, features - f)
+        augmented[i, :, f0:f0+f] = 0
+
+    return augmented
+
 class NeuralDataLoader:
     """
     Unified interface for loading Real or Synthetic Neural Data.
@@ -142,4 +170,8 @@ def data_generator(
         # Generate batch-sized chunks
         ecog_batch = loader.load_data(batch_size, timesteps, features)
         phoneme_batch = loader.load_labels(batch_size, timesteps, num_classes)
+
+        # Apply SpecAugment to simulated data
+        ecog_batch = spec_augment(ecog_batch)
+
         yield ecog_batch, phoneme_batch

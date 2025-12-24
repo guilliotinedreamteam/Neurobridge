@@ -48,10 +48,12 @@ def train_model() -> tf.keras.callbacks.History:
     learning_rate = WarmUpSchedule(D_MODEL)
     optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
-    print("Compiling Model with Warmup Scheduler...")
+    print("Compiling Model with Warmup Scheduler and Label Smoothing...")
+    loss_fn = tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1)
+
     model.compile(
         optimizer=optimizer,
-        loss='categorical_crossentropy',
+        loss=loss_fn,
         metrics=['accuracy']
     )
     model.summary()
