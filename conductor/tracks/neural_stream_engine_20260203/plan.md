@@ -1,23 +1,11 @@
 # Implementation Plan: Neural Stream Engine
 
-## Phase 1: Core Infrastructure
+## Phase 1: Core Infrastructure [checkpoint: 509e76e]
 
 - [x] Task: Implement AsyncRingBuffer 57496a1
-    - [ ] Create `tests/realtime/test_buffer.py` with 100% coverage cases (overflow, concurrency).
-    - [ ] Implement `neurobridge/realtime/buffer.py`.
-    - [ ] Verify 100% coverage.
-
 - [x] Task: Implement SignalSupervisor 9daa7e7
-    - [ ] Create `tests/realtime/test_supervisor.py` (dead channel detection, SNR calc).
-    - [ ] Implement `neurobridge/realtime/supervisor.py`.
-    - [ ] Verify 100% coverage.
-
 - [x] Task: Implement NeuralEngine Producer-Consumer d5c12d4
-    - [ ] Create `tests/realtime/test_engine.py` (lifecycle, timing, cancellation).
-    - [ ] Implement `neurobridge/realtime/engine.py`.
-    - [ ] Verify 100% coverage.
-
-- [ ] Task: Conductor - User Manual Verification 'Core Infrastructure' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Core Infrastructure' (Protocol in workflow.md) 509e76e
 
 ## Phase 2: API Integration
 
