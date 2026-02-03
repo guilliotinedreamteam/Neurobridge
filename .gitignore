@@ -66,24 +66,3 @@ htmlcov/
 *.dat
 *.h5
 *.pkl
-
-# Flutter / Dart
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-/build/
-mobile_app/build/
-mobile_app/ios/Flutter/App.framework
-mobile_app/ios/Flutter/Flutter.framework
-mobile_app/ios/Flutter/Generated.xcconfig
-mobile_app/ios/Flutter/app.flx
-mobile_app/ios/Flutter/app.zip
-mobile_app/ios/ServiceDefinitions.json
-mobile_app/ios/Runner/GeneratedPluginRegistrant.h
-mobile_app/ios/Runner/GeneratedPluginRegistrant.m
-mobile_app/android/key.properties
-mobile_app/**/*.lock
-mobile_app/.dart_tool/
