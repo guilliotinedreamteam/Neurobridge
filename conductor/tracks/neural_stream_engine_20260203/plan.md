@@ -9,7 +9,7 @@
 
 ## Phase 2: API Integration
 
-- [ ] Task: Integrate with FastAPI WebSocket
+- [x] Task: Integrate with FastAPI WebSocket e6d90bd
     - [ ] Create `tests/test_api_integration.py` (websocket connect, data schema validation).
     - [ ] Update `neurobridge/api.py` to use `NeuralEngine` global instance.
     - [ ] Verify 100% coverage.
