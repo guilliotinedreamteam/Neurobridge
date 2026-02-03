@@ -2,11 +2,11 @@ from fastapi import FastAPI, HTTPException, WebSocket, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
+from contextlib import asynccontextmanager
 import threading
 import asyncio
 import json
-import random
-import math
+import time
 from pathlib import Path
 from loguru import logger
 
@@ -14,8 +14,36 @@ from .config import NeuroBridgeConfig, DatasetConfig
 from .data_pipeline import PhonemeInventory
 from .speech import PhonemeSynthesizer
 from .training import train_and_evaluate
+from .signals import SineWaveSignalProvider, ReplaySignalProvider
+from .realtime.engine import NeuralEngine
 
-app = FastAPI(title="NeuroBridge API", version="1.0.0")
+# Global Engine Management (used in lifespan)
+engine: Optional[NeuralEngine] = None
+engine_task: Optional[asyncio.Task] = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global engine, engine_task
+    # Startup
+    provider = SineWaveSignalProvider(num_channels=128)
+    engine = NeuralEngine(provider)
+    engine_task = asyncio.create_task(engine.start())
+    logger.info("Neural Engine background task started")
+    
+    yield
+    
+    # Shutdown
+    if engine:
+        await engine.stop()
+    if engine_task:
+        engine_task.cancel()
+        try:
+            await engine_task
+        except asyncio.CancelledError:
+            pass
+    logger.info("Neural Engine background task stopped")
+
+app = FastAPI(title="NeuroBridge API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,6 +64,7 @@ class SynthesisRequest(BaseModel):
 class SystemStatus(BaseModel):
     status: str
     current_task: Optional[str] = None
+    engine_running: bool = False
 
 # Thread-safe system state
 class StateManager:
@@ -52,33 +81,36 @@ class StateManager:
             self._state["status"] = status
             self._state["current_task"] = task
 
-from .signals import SineWaveSignalProvider, ReplaySignalProvider
-
 state_manager = StateManager()
 
 @app.get("/status", response_model=SystemStatus)
 def get_status():
-    return state_manager.get_state()
+    state = state_manager.get_state()
+    # Note: engine is global and managed by lifespan
+    state["engine_running"] = engine._running if engine else False
+    return state
 
 @app.websocket("/ws/signals")
-async def websocket_endpoint(websocket: WebSocket, source: Optional[str] = None):
+async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     
-    # Select signal provider
-    if source and Path(source).exists():
-        provider = ReplaySignalProvider(Path(source))
-    else:
-        provider = SineWaveSignalProvider()
+    if not engine:
+        await websocket.close(code=1001, reason="Engine not initialized")
+        return
+
+    # Create a subscriber queue
+    q = asyncio.Queue(maxsize=10)
+    engine.add_subscriber(q)
 
     try:
-        t = 0
         while True:
-            data = provider.get_next_sample()
-            await websocket.send_json({"timestamp": t, "channels": data})
-            t += 1
-            await asyncio.sleep(0.05) # 20Hz update rate for demo
+            # Wait for Holographic Frame from engine
+            frame = await q.get()
+            await websocket.send_json(frame)
     except Exception as e:
-        logger.info(f"WebSocket disconnected: {e}")
+        logger.info(f"WebSocket disconnected or error: {e}")
+    finally:
+        engine.remove_subscriber(q)
 
 async def run_training_task(config_path: str, epochs: int):
     state_manager.set_task("training", f"Training with {config_path}")
@@ -132,10 +164,6 @@ def trigger_synthesis(req: SynthesisRequest):
     except Exception as e:
         logger.error(f"Synthesis failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
     import uvicorn
