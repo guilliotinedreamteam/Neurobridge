@@ -10,12 +10,14 @@ async def test_ring_buffer_overflow():
     
     # Push 15 frames
     for i in range(15):
-        frame = np.full((128,), i) # Frame of all i's
-        await buf.push(frame)
+        frame = np.full((128,), float(i))
+        await buf.push(frame, timestamp=float(i))
     
     # Check head/tail logic
     assert buf.size() == 10
     
-    # Pop oldest (should be 5, not 0)
-    data = await buf.pop()
+    # Pop oldest (FIFO)
+    # 0,1,2,3,4 were overwritten. 5 is oldest.
+    data, ts = await buf.pop()
     assert data[0] == 5.0
+    assert ts == 5.0

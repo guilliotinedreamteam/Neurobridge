@@ -1,6 +1,7 @@
 import asyncio
 import time
 import numpy as np
+from typing import List, Set
 from loguru import logger
 from .buffer import AsyncRingBuffer
 from .supervisor import SignalSupervisor
@@ -14,6 +15,16 @@ class NeuralEngine:
         self._running = False
         self._frames_processed = 0
         self.latest_frame = None
+        self._subscribers: Set[asyncio.Queue] = set()
+
+    def add_subscriber(self, queue: asyncio.Queue):
+        self._subscribers.add(queue)
+        logger.debug(f"Subscriber added. Total: {len(self._subscribers)}")
+
+    def remove_subscriber(self, queue: asyncio.Queue):
+        if queue in self._subscribers:
+            self._subscribers.remove(queue)
+            logger.debug(f"Subscriber removed. Total: {len(self._subscribers)}")
 
     async def start(self):
         self._running = True
@@ -40,8 +51,8 @@ class NeuralEngine:
             # 1. Get Data
             frame = self.provider.get_next_sample()
             
-            # 2. Push to Buffer
-            await self.buffer.push(frame)
+            # 2. Push to Buffer with timestamp
+            await self.buffer.push(frame, timestamp=time.time())
             
             # 3. Maintain Timing (4ms = 250Hz)
             elapsed = time.time() - start_time
@@ -51,21 +62,48 @@ class NeuralEngine:
     async def _consumer(self):
         """Processes data at ~20Hz (50ms)"""
         while self._running:
-            # 1. Get latest frame for viz
+            # 1. Get latest frame
             if self.buffer.size() > 0:
-                self.latest_frame = await self.buffer.pop()
+                raw_frame, t0 = await self.buffer.pop()
+                
+                self.latest_frame = raw_frame
                 self._frames_processed += 1
                 
                 # Apply Health Mask
-                # clean_frame = self.supervisor.apply_mask(self.latest_frame)
+                clean_frame = self.supervisor.apply_mask(raw_frame)
                 
-                # TODO: Run Decoder Here
+                # Create Holographic Frame
+                hologram = {
+                    "timestamp": t0,
+                    "latency_ms": (time.time() - t0) * 1000,
+                    "signal_snapshot": clean_frame.tolist(),
+                    "health": {
+                        "bad_channels": np.where(~self.supervisor.get_channel_status())[0].tolist(),
+                        "buffer_size": self.buffer.size()
+                    }
+                }
+                
+                # Broadcast to subscribers
+                await self._broadcast(hologram)
             
             await asyncio.sleep(0.05) # 20Hz
+
+    async def _broadcast(self, data: dict):
+        if not self._subscribers:
+            return
+            
+        for q in self._subscribers:
+            try:
+                if q.full():
+                    q.get_nowait() # Drop oldest if full
+                q.put_nowait(data)
+            except Exception as e:
+                logger.error(f"Broadcast error: {e}")
 
     def get_stats(self):
         return {
             "running": self._running,
             "frames_processed": self._frames_processed,
-            "buffer_size": self.buffer.size()
+            "buffer_size": self.buffer.size(),
+            "subscribers": len(self._subscribers)
         }

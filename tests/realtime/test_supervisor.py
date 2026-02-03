@@ -15,3 +15,12 @@ def test_detect_dead_channel():
     
     assert status[3] == False # Dead
     assert status[0] == True  # Active
+
+def test_apply_mask():
+    sup = SignalSupervisor(channels=4)
+    sup.channel_status = np.array([True, True, True, False])
+    
+    frame = np.array([1.0, 2.0, 3.0, 4.0])
+    masked = sup.apply_mask(frame)
+    
+    assert np.array_equal(masked, np.array([1.0, 2.0, 3.0, 0.0]))
