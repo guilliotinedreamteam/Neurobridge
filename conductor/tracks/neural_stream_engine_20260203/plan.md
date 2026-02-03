@@ -7,7 +7,7 @@
     - [ ] Implement `neurobridge/realtime/buffer.py`.
     - [ ] Verify 100% coverage.
 
-- [ ] Task: Implement SignalSupervisor
+- [x] Task: Implement SignalSupervisor 9daa7e7
     - [ ] Create `tests/realtime/test_supervisor.py` (dead channel detection, SNR calc).
     - [ ] Implement `neurobridge/realtime/supervisor.py`.
     - [ ] Verify 100% coverage.
