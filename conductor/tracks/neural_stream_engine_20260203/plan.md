@@ -12,7 +12,7 @@
     - [ ] Implement `neurobridge/realtime/supervisor.py`.
     - [ ] Verify 100% coverage.
 
-- [ ] Task: Implement NeuralEngine Producer-Consumer
+- [x] Task: Implement NeuralEngine Producer-Consumer d5c12d4
     - [ ] Create `tests/realtime/test_engine.py` (lifecycle, timing, cancellation).
     - [ ] Implement `neurobridge/realtime/engine.py`.
     - [ ] Verify 100% coverage.
