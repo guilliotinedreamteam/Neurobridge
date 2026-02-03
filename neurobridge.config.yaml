@@ -1,0 +1,51 @@
+dataset:
+  ecog_dir: data/ecog
+  labels_dir: data/labels
+  file_extension: ".mat"
+  label_extension: ".csv"
+  mat_key: ecog_data
+  sampling_rate_hz: 1000
+  target_rate_hz: 200
+  window_duration_ms: 400
+  stride_ms: 40
+  num_features: 128
+  label_columns:
+    start: start_sec
+    end: end_sec
+    label: phoneme
+  max_files: null
+  random_seed: 13
+
+model:
+  rnn_units: [256, 256]
+  realtime_units: [192, 128]
+  conv_filters: [64, 128]
+  conv_kernel_size: 5
+  dense_units: 256
+  dropout_rate: 0.3
+
+training:
+  batch_size: 16
+  max_epochs: 50
+  learning_rate: 0.001
+  val_split: 0.1
+  test_split: 0.1
+  steps_per_epoch: null
+  cache_dataset: true
+  log_dir: runs/neurobridge
+  checkpoint_dir: artifacts/neurobridge
+  metrics_path: artifacts/neurobridge/metrics.json
+
+realtime:
+  frame_ms: 40
+  context_ms: 400
+  smoothing_window: 5
+  emit_threshold: 0.4
+  debounce_ms: 150
+
+speech:
+  sample_rate: 16000
+  phoneme_duration_ms: 80
+  release_ms: 20
+  base_amplitude: 0.15
+  export_audio_dir: artifacts/neurobridge/audio

@@ -8,77 +8,67 @@ NeuroBridge is a sophisticated system designed to facilitate communication betwe
 
 ## Features
 
-- Real-time neural signal processing
-- Advanced data filtering and analysis
-- Modular architecture for easy extension
-- Support for multiple neural interface protocols
-- Web-based visualization dashboard
+- **Real-time Signal Visualization**: WebSocket-based streaming of 128-channel ECoG data.
+- **Modern Dashboard**: React + Tailwind + shadcn/ui based control panel.
+- **FastAPI Backend**: Robust Python backend for training and inference.
+- **Transformer Architecture**: State-of-the-art decoding models.
+- **Modular Design**: Easy to extend for new neural protocols.
 
 ## Project Structure
 
 ```
-neurobridge/
-├── neurobridge.py          # Core Python module
-├── src/                    # React frontend source
-├── public/                 # Static assets
-├── requirements.txt        # Python dependencies
-└── package.json           # Node.js dependencies
+giga-apps/graceful-ferret-soar/
+├── neurobridge/              # Python Backend
+│   ├── api.py                # FastAPI Server
+│   ├── models.py             # Transformer & RNN Models
+│   ├── data_pipeline.py      # Optimized Data Loading
+│   └── ...
+├── src/                      # React Frontend
+│   ├── components/           # UI Components (Visualizer, Sidebar)
+│   ├── pages/                # Dashboard Pages
+│   └── lib/                  # API Clients
+└── neurobridge.config.yaml   # Configuration
 ```
 
-## Installation
+## Quick Start (Demo Mode)
 
-### Backend Setup
+We have provided a unified runner script to start both the Backend (FastAPI) and Frontend (Vite) in simulation mode.
 
-1. Install Python dependencies:
-```bash
-pip install -r requirements.txt
-```
+1. **Install Dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   pip install fastapi uvicorn websockets
+   cd graceful-ferret-soar
+   npm install
+   cd ..
+   ```
 
-2. Run the NeuroBridge module:
-```bash
-python neurobridge.py
-```
+2. **Run the System:**
+   ```bash
+   ./run_neurobridge.sh
+   ```
 
-### Frontend Setup
+3. **Access the Dashboard:**
+   Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-1. Install Node.js dependencies:
-```bash
-npm install
-```
+## Backend API
 
-2. Start the development server:
-```bash
-npm run dev
-```
-
-3. Build for production:
-```bash
-npm run build
-```
-
-## Usage
-
-The NeuroBridge system consists of two main components:
-
-1. **Backend (Python)**: Handles neural signal processing and data analysis
-2. **Frontend (React)**: Provides a web-based interface for visualization and control
+- **Status**: `GET /status`
+- **Train**: `POST /train` (Starts async training)
+- **Synthesize**: `POST /synthesize` (Phoneme to Audio)
+- **Stream**: `WS /ws/signals` (Real-time data stream)
 
 ## Configuration
 
-Configuration options can be set through environment variables or configuration files. See the documentation for detailed setup instructions.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+Configuration options live inside `neurobridge.config.yaml`. Key fields:
+- `dataset`: Input directories and sampling rates.
+- `model`: Choose between `rnn` or `transformer` architecture.
+- `training`: Hyperparameters.
 
 ## License
 
-This project is open source and available under the MIT License.
-
-## Support
-
-For questions and support, please open an issue on GitHub.
+MIT License.
 
 ---
 
-Made with [Giga](https://gigamind.dev/)
+Made with [Giga](https://gigamind.dev/) & Improved by **Ralph Loop**.
